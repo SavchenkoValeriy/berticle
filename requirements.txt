@@ -1,0 +1,4 @@
+allennlp
+numpy
+scipy
+spacy
