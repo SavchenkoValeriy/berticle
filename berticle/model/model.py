@@ -23,13 +23,7 @@ class ArticleModel(Model):
         super().__init__(Vocabulary())
         self.word_embeddings = word_embeddings
         self.encoder = encoder
-        self.transformer = MultiHeadSelfAttention(
-            num_heads=out_size,
-            input_dim=self.encoder.get_output_dim(),
-            attention_dim=out_size * 10,
-            values_dim=out_size * hidden_size
-        )
-        self.projection = nn.Linear(self.transformer.get_output_dim(),
+        self.projection = nn.Linear(self.encoder.get_output_dim(),
                                     out_size)
         self.loss = sequence_cross_entropy_with_logits
         self.accuracy = CategoricalAccuracy()
@@ -40,15 +34,10 @@ class ArticleModel(Model):
                 labels: torch.Tensor = None,
                 positions: List[int] = []) -> torch.Tensor:
         seq_mask = get_text_field_mask(tokens)
-        print(seq_mask)
 
         embeddings = self.word_embeddings(tokens)
         state = self.encoder(embeddings, seq_mask)
-        print(state)
-        state = self.transformer(state, seq_mask)
-        print(state)
         class_logits = self.projection(state)
-        print(class_logits)
 
         output = {"class_logits": class_logits}
 
