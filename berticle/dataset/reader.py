@@ -3,8 +3,13 @@ import spacy
 
 from allennlp.data import Instance
 from allennlp.data.dataset_readers import DatasetReader
+from allennlp.data.fields import (ArrayField, Field, TextField,
+                                  MetadataField, SequenceLabelField)
+from allennlp.data.tokenizers import Token
 from collections import namedtuple
 from typing import Iterator, List
+
+from .bert import BERT_MAX_LENGTH, token_indexer, tokenizer
 
 
 Tokens = List[spacy.tokens.Token]
@@ -99,3 +104,7 @@ class ArticleDatasetReader(DatasetReader):
             for doc in nlp.pipe(f.readlines(),
                                 disable=["parser", "ner", "textcat"]):
                 yield self.text_to_instance(doc)
+
+
+def get_default_reader() -> ArticleDatasetReader:
+    return ArticleDatasetReader({"tokens": token_indexer}, tokenizer)
