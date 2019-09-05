@@ -99,11 +99,16 @@ class ArticleDatasetReader(DatasetReader):
 
     def _read(self, filepath: str) -> Iterator[Instance]:
         with open(filepath) as f:
-            nlp = spacy.load("en_core_web_sm")
-            # we only need a tokenizer and a POS tagger
-            for doc in nlp.pipe(f.readlines(),
-                                disable=["parser", "ner", "textcat"]):
-                yield self.text_to_instance(doc)
+            self.read_lines(f.readlines())
+
+    def read_lines(self, lines: List[str]) -> Iterator[Instance]:
+        nlp = spacy.load("en_core_web_sm")
+        # we only need a tokenizer and a POS tagger
+        for doc in nlp.pipe(lines,
+                            disable=["parser", "ner", "textcat"]):
+            if not doc: continue
+            yield self.text_to_instance(doc)
+
 
 
 def get_default_reader() -> ArticleDatasetReader:
